@@ -14,24 +14,32 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-        const phoneCategoriesCollection = client.db('cellRoom').collection('phones');
-        const allBrandsCollection = client.db('cellRoom').collection('allPhones')
-
+        const allBrandsCollection = client.db('cellRoom').collection('allPhonesAndCategory')
 
         app.get('/allPhones', async (req, res) => {
             const query = {};
-            const categories = await phoneCategoriesCollection.find(query).toArray();
+            const categories = await allBrandsCollection.find(query).toArray();
             res.send(categories)
         });
 
         app.get('/allPhones/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const categoryPhone = await allBrandsCollection.find(query).toArray();
-            console.log(categoryPhone);
-            res.send(categoryPhone)
-        });
+            const allCategories = await allBrandsCollection.find(query).toArray();
+            console.log(allCategories);
+            res.send(allCategories)
+        })
 
+        app.get('/allPhones/:id', async (req, res) => {
+            const query = {};
+            const categories = await phoneCategoriesCollection.find(query).toArray();
+            res.send(categories)
+        });
+        // app.post('/buyerList', async (req, res) => {
+        //     const buyer = req.body;
+        //     const result = await buyerCollection.insertOne(buyer);
+        //     res.send(result);
+        // })
 
     }
     finally {
