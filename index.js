@@ -30,11 +30,11 @@ async function run() {
             res.send(allCategories)
         })
 
-        app.get('/allPhones/:id', async (req, res) => {
-            const query = {};
-            const categories = await phoneCategoriesCollection.find(query).toArray();
-            res.send(categories)
-        });
+        // app.get('/allPhones/:id', async (req, res) => {
+        //     const query = {};
+        //     const categories = await phoneCategoriesCollection.find(query).toArray();
+        //     res.send(categories)
+        // });
         // app.post('/buyerList', async (req, res) => {
         //     const buyer = req.body;
         //     const result = await buyerCollection.insertOne(buyer);
