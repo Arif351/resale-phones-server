@@ -14,7 +14,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try {
-        const allBrandsCollection = client.db('cellRoom').collection('allPhonesAndCategory')
+        const allBrandsCollection = client.db('cellRoom').collection('allPhonesAndCategory');
+        const bookingsCollection = client.db('cellRoom').collection('bookingPhone');
 
         app.get('/allPhones', async (req, res) => {
             const query = {};
@@ -28,18 +29,16 @@ async function run() {
             const allCategories = await allBrandsCollection.find(query).toArray();
             console.log(allCategories);
             res.send(allCategories)
+        });
+
+        app.post('/bookings', async (req, res) => {
+            const bookings = req.body;
+            console.log(bookings);
+            const result = await bookingsCollection.insertOne(bookings);
+            console.log(result);
+            res.send(result);
         })
 
-        // app.get('/allPhones/:id', async (req, res) => {
-        //     const query = {};
-        //     const categories = await phoneCategoriesCollection.find(query).toArray();
-        //     res.send(categories)
-        // });
-        // app.post('/buyerList', async (req, res) => {
-        //     const buyer = req.body;
-        //     const result = await buyerCollection.insertOne(buyer);
-        //     res.send(result);
-        // })
 
     }
     finally {
