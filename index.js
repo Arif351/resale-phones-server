@@ -50,6 +50,38 @@ async function run() {
             res.send(allCategories)
         });
 
+        app.get('/buyers', async (req, res) => {
+            const query = {};
+            const buyers = await usersCollection.find(query).toArray();
+            res.send(buyers)
+        });
+
+        app.get('/buyers/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const buyerAdmin = await usersCollection.findOne(query);
+            res.send({ isAdmin: buyerAdmin?.role === 'admin' })
+        })
+
+        app.put('/buyers/admin/:id', verifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail }
+            const user = await usersCollection.findOne(query)
+            if (buyer?.role !== 'admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updatedDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await usersCollection.updateOne(filter, updatedDoc, options)
+            res.send(result);
+        })
+
         app.get('/blog', async (req, res) => {
             const query = {};
             const blogsAnswer = await blogCollection.find(query).toArray();
