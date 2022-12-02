@@ -20,6 +20,23 @@ async function run() {
         const usersCollection = client.db('cellRoom').collection('usersCollection');
         const blogCollection = client.db('cellRoom').collection('blog');
 
+        function verifyJWT(req, res, next) {
+            console.log('token inside', req.headers.authorization);
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                return res.status(401).send('Unauthorized access.')
+            }
+            const token = authHeader.split(' ')[1];
+            jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+                if (err) {
+                    return res.status(403).send({ message: 'forbidden access' })
+                }
+                req.decoded = decoded;
+                next();
+            })
+
+        }
+
         app.get('/allPhones', async (req, res) => {
             const query = {};
             const categories = await allBrandsCollection.find(query).toArray();
@@ -47,9 +64,12 @@ async function run() {
             console.log(result);
         });
 
-        app.get('/bookings', async (req, res) => {
+        app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
-            console.log('token', req.headers.authorization);
+            const decodedEmail = req.decoded.email;
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
             const query = { email: email }
             const bookings = await bookingsCollection.find(query).toArray();
             res.send(bookings);
